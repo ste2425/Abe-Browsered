@@ -10,34 +10,23 @@ function preload() {
 }
 
 function create() {
-	var anminData = game.cache.getJSON('animationDataAbe');
-	var player = game.add.sprite(50, 35, 'abeCharacter');
-
-	player.anchor.setTo(0.5, 0.5); //so it flips around its middle
-
-	player.animations.add('walkingR', anminData.walkingR, 20, true);
-	player.animations.add('walkingL', anminData.walkingL, 20, true);
-	player.animations.add('idleR', anminData.idleR, 10, true);
-	player.animations.add('idleL', anminData.idleL, 10, true);
-	player.animations.add('doh', anminData.doh, 20, false);
-	player.animations.add('walkingJumpR', anminData.walkingJumpR, 20, true);
-	player.animations.add('walkTurnR', anminData.walkTurnR, 13, false);
-	player.animations.add('walkTurnL', anminData.walkTurnL, 13, false)
-
-	game.player = new character('abe', anminData, player).abe;
-
+	game.player = new character('abe', 'animationDataAbe', game, 50, 35, 'abeCharacter').abe;
 }
-var jumping = false;
-var dohing = false;
 
 function update() {
 	var cursors = game.input.keyboard.createCursorKeys();
+	var wsad = {
+		up: game.input.keyboard.addKey(Phaser.Keyboard.W),
+		down: game.input.keyboard.addKey(Phaser.Keyboard.S),
+		left: game.input.keyboard.addKey(Phaser.Keyboard.A),
+		right: game.input.keyboard.addKey(Phaser.Keyboard.D),
+	};
 	var jump = game.input.keyboard.addKey(Phaser.Keyboard.P);
 	var doh = game.input.keyboard.addKey(Phaser.Keyboard.D);
 
 	//game.player.update();
 
-	if (doh.isDown) {
+	/*if (doh.isDown) {
 		game.player.doh();
 	} else if (jump.isDown) {
 		if (!jumping) {
@@ -45,12 +34,14 @@ function update() {
 			jumping = true;
 			//game.player.animations.play('walkingJumpR');
 		}
-	} else if (cursors.left.isDown) {
+	} else */
+
+	if (cursors.left.isDown) {
 		game.player.walk('L')
 	} else if (cursors.right.isDown) {
 		game.player.walk('R');
 	} else {
-		game.player.animations.play('idle');
+		game.player.idle();
 	}
 
 	//  Allow the player to jump if they are touching the ground.
@@ -60,25 +51,14 @@ function update() {
     }*/
 }
 
-function character(name, anminData, player) {
+function character(Name, AnminData, Game, posX, posY, characterKey) {
 	if (!(this instanceof character)) {
 		return new character(name, anminData);
 	}
 
 	var me = {};
 
-	me.name = name;
-	me.anminData = anminData;
-	me.player = player;
-	me.state = {
-		idle: true,
-		facing: 'R',
-		walking: false,
-		turning: false,
-		doh: false,
-		stopping: false
-	}
-	me.currentAnmin;
+	init();
 
 	me.walk = function(direction) {
 		direction = direction.toUpperCase();
@@ -142,5 +122,30 @@ function character(name, anminData, player) {
 		}
 	}, me.player);
 
-	this[name] = me;
+	function init() {
+		//Initialise function
+		me.name = Name;
+		me.anminData = Game.cache.getJSON(AnminData);
+
+		//Create phaser player object
+		me.player = Game.add.sprite(posX, posY, characterKey);
+		me.player.anchor.setTo(0.5, 0.5);
+		//Add adnimations from animation data json
+		for (var i in me.anminData) {
+			me.player.animations.add(i, me.anminData[i].Data, me.anminData[i].FrameRate, me.anminData[i].Loop);
+		}
+
+		me.state = {
+			idle: true,
+			facing: 'R',
+			walking: false,
+			turning: false,
+			doh: false,
+			stopping: false
+		}
+
+		me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
+	}
+
+	this[me.name] = me;
 }
