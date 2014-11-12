@@ -5,15 +5,56 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
 });
 
 function preload() {
+	game.load.image('ground', 'assets/platform.png');
 	game.load.atlasJSONHash('abeCharacter', 'assets/walking.png', 'assets/walking.json');
 	game.load.json('animationDataAbe', 'assets/animationDataAbe.json');
 }
 
 function create() {
-	game.player = new character('abe', 'animationDataAbe', game, 50, 35, 'abeCharacter').abe;
+	game.stage.backgroundColor = 0xbada55;
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	ground = game.add.group();
+	platforms = game.add.group();
+
+
+	platforms.enableBody = true;
+	ground.enableBody = true;
+
+	var floor = ground.create(0, game.world.height - 64, 'ground');
+	var wall = platforms.create(500, game.world.height - 84, 'ground');
+
+	wall.scale.setTo(0.5, 0.5);
+	wall.body.immovable = true;
+
+	floor.scale.setTo(2, 2);
+	floor.body.immovable = true;
+
+	game.player = new character('abe', 'animationDataAbe', game, 50, game.world.height - 100, 'abeCharacter').abe;
+	game.physics.arcade.enable(game.player.player);
+
+	game.player.player.body.bounce.y = 0.1;
+	game.player.player.body.gravity.y = 900;
+	game.player.player.body.collideWorldBounds = true;
 }
 
 function update() {
+	if (!game.player) return;
+
+
+	game.physics.arcade.collide(game.player.player, platforms, function(e, i) {
+		if (game.player.state.walking) {
+			game.player.collide(i.body.touching, {
+				invert: true
+			});
+			//console.log(i.body.blocked)
+		}
+	});
+
+	game.physics.arcade.collide(game.player.player, ground);
+
+
+
 	var cursors = game.input.keyboard.createCursorKeys();
 	var wsad = {
 		up: game.input.keyboard.addKey(Phaser.Keyboard.W),
@@ -24,11 +65,12 @@ function update() {
 	var jump = game.input.keyboard.addKey(Phaser.Keyboard.P);
 	var doh = game.input.keyboard.addKey(Phaser.Keyboard.D);
 
-	//game.player.update();
+	game.player.update();
 
-	/*if (doh.isDown) {
+	if (doh.isDown) {
 		game.player.doh();
-	} else if (jump.isDown) {
+	}
+	/*else if (jump.isDown) {
 		if (!jumping) {
 			console.log('jump')
 			jumping = true;
@@ -41,7 +83,8 @@ function update() {
 	} else if (cursors.right.isDown) {
 		game.player.walk('R');
 	} else {
-		game.player.idle();
+		game.player.stop();
+		//game.player.idle();
 	}
 
 	//  Allow the player to jump if they are touching the ground.
@@ -58,41 +101,72 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 
 	var me = {};
 
-	init();
-
 	me.walk = function(direction) {
 		direction = direction.toUpperCase();
 
-		if (me.state.turning) return;
+		if (me.state.turning || me.state.startingWColide) return;
 
-		if (direction != me.state.facing && !me.state.turning) {
+		if(me.state.activeWColide){
+			me.currentAnmin = me.player.animations.play('WalkingCollideRActive');
+		} else if (direction != me.state.facing && !me.state.turning) {
 			me.state.idle = false;
 			me.state.turning = true;
 			me.state.facing = direction;
 
 			//play turn anim
+			if (me.player.body)
+				me.player.body.velocity.x = 0;
 			me.currentAnmin = me.player.animations.play('walkTurn' + direction);
 		} else if (me.state.idle || !me.state.turning) {
 			me.state.idle = false;
 			me.state.walking = true;
 			me.state.facing = direction;
 			//play walk anmin
+			me.player.body.velocity.x = (me.state.facing == 'R' ? 120 : -120);
 			me.currentAnmin = me.player.animations.play('walking' + direction);
 		}
 	}
 	me.idle = function() {
 		if (!me.state.idle && !me.state.turning) {
 			me.state.idle = true;
+			if (me.player.body)
+				me.player.body.velocity.x = 0;
 			me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
 		}
 	}
 	me.doh = function() {
-		if (!me.state.doh)
+		if (!me.state.doh) {
+			me.state.doh = true;
 			me.currentAnmin = me.player.animations.play('doh');
+		}
 	}
 	me.stop = function() {
-		if (!me.state.stopping)
+		if (!me.state.stopping && !me.state.idle){
 			me.state.stopping = true;
+		}else if(me.state.startingWColide || me.state.activeWColide){
+			me.state.stopingWColide = true;
+			me.state.activeWColide = false;
+			me.state.startingWColide = false
+			me.player.animations.play('WalkingCollideRStop');
+		}
+	}
+	me.collide = function(location, opts) {
+		if(me.state.activeWColide || me.state.stopingWColide) return;
+
+		if (opts.invert) {
+			location = {
+				up: location.down,
+				down: location.up,
+				left: location.right,
+				right: location.left
+			};
+		}
+		console.log('collide', me.state.startingWColide, me.state.activeWColide)
+		if(!me.state.startingWColide){
+			me.state.startingWColide = true;
+			me.currentAnmin = me.player.animations.play('WalkingCollideRStart');
+		}
+
 	}
 	me.update = function() {
 		/*if (me.currentAnmin) {
@@ -110,7 +184,17 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 				}
 			}
 		}*/
+		if (!me.currentAnmin || !me.currentAnmin.currentFrame) return;
+
+		if (me.state.stopping && me.currentAnmin.currentFrame.name.indexOf('S') != -1) {
+			me.state.stopping = false;
+			me.state.walking = false;
+			me.idle();
+		}
 	}
+
+
+	init();
 
 	me.player.events.onAnimationComplete.add(function() {
 		if (me.state.turning) {
@@ -119,7 +203,15 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			if (!me.state.walking) me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
 		} else if (me.state.doh) {
 			me.state.doh = false;
+			me.idle();
+		} else if(me.state.startingWColide){
+			me.state.startingWColide = false;
+			me.state.activeWColide = true;
+		}else if(me.state.stopingWColide){
+			me.state.stopingWColide = false;
+			me.idle();
 		}
+		console.log('complete', me.state.startingWColide, me.state.activeWColide)
 	}, me.player);
 
 	function init() {
@@ -129,22 +221,25 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 
 		//Create phaser player object
 		me.player = Game.add.sprite(posX, posY, characterKey);
-		me.player.anchor.setTo(0.5, 0.5);
+		me.player.anchor.setTo(0.5, 1);
 		//Add adnimations from animation data json
 		for (var i in me.anminData) {
 			me.player.animations.add(i, me.anminData[i].Data, me.anminData[i].FrameRate, me.anminData[i].Loop);
 		}
 
 		me.state = {
-			idle: true,
+			idle: false,
 			facing: 'R',
 			walking: false,
 			turning: false,
 			doh: false,
-			stopping: false
+			stopping: false,
+			activeWColide: false,
+			startingWColide: false,
+			stopingWColide: false
 		}
 
-		me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
+		me.idle();
 	}
 
 	this[me.name] = me;

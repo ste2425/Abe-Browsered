@@ -1,0 +1,57 @@
+{
+	"walkingR": {
+		"Data": ["wr1.png", "wr2.png", "wr3.png", "wr4.png", "wr5.png", "wr6.png", "wr7.png", "wr8.png", "wr9S.png", "wr10.png", "wr11.png", "wr12.png", "wr13.png", "wr14.png", "wr15.png", "wr16.png", "wr17.png", "wr18S.png"],
+		"FrameRate": 20,
+		"Loop": true
+	},
+	"walkingL": {
+		"Data": ["wl1.png", "wl2.png", "wl3.png", "wl4.png", "wl5.png", "wl6.png", "wl7.png", "wl8.png", "wl9S.png", "wl10.png", "wl11.png", "wl12.png", "wl13.png", "wl14.png", "wl15.png", "wl16.png", "wl17.png", "wl18S.png"],
+		"FrameRate": 20,
+		"Loop": true
+	},
+	"WalkingCollideRStart": {
+		"Data" : ["wcR1.png", "wcR2.png", "wcR3.png", "wcR4.png"],
+		"FrameRate": 40,
+		"Loop": false
+	},
+	"WalkingCollideRStop": {
+		"Data" : ["wcR14.png", "wcR15.png", "wcR16.png"],
+		"FrameRate": 40,
+		"Loop": false
+	},
+	"WalkingCollideRActive": {
+		"Data" : ["wcR5.png", "wcR6.png", "wcR7.png", "wcR8.png", "wcR9.png", "wcR11.png", "wcR12.png", "wcR13.png"],
+		"FrameRate": 13,
+		"Loop": true
+	},
+	"idleR": {
+		"Data": ["ir1.png", "ir2.png", "ir3.png", "ir4.png", "ir5.png", "ir6.png", "ir7.png", "ir8.png"],
+		"FrameRate": 11,
+		"Loop": true
+	},
+	"idleL": {
+		"Data": ["il1.png", "il2.png", "il3.png", "il4.png", "il5.png", "il6.png", "il7.png", "il8.png"],
+		"FrameRate": 11,
+		"Loop": true
+	},
+	"doh": {
+		"Data": ["d1.png", "d2.png", "d3.png", "d4.png", "d5.png", "d6.png", "d7.png", "d8.png", "d7.png", "d6.png", "d5.png", "d4.png", "d3.png", "d2.png", "d1.png"],
+		"FrameRate": 20,
+		"Loop": false
+	},
+	"walkingJumpR": {
+		"Data": ["jr1.png", "jr2.png", "jr3.png", "jr4.png", "jr5.png", "jr6.png", "jr7.png", "jr8.png", "jr9.png", "jr10.png", "jr11.png", "jr12.png", "jr13.png", "jr14.png", "jr15.png", "jr16.png", "jr17.png", "jr18.png", "jr19.png", "jr20.png", "jr21.png", "jr22.png", "jr1.png"],
+		"FrameRate": 20,
+		"Loop": true
+	},
+	"walkTurnL": {
+		"Data": ["wtL1.png", "wtL2.png", "wtL3.png", "wtL4.png", "wtL5.png", "wtL6.png", "wtL7.png", "wtL8.png", "wtL9.png", "wtL10.png"],
+		"FrameRate": 20,
+		"Loop": false
+	},
+	"walkTurnR": {
+		"Data": ["wtR1.png", "wtR2.png", "wtR3.png", "wtR4.png", "wtR5.png", "wtR6.png", "wtR7.png", "wtR8.png", "wtR9.png", "wtR10.png"],
+		"FrameRate": 20,
+		"Loop": false
+	}
+}
