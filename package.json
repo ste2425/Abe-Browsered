@@ -1,0 +1,10 @@
+{
+  "name": "abebrowsered",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "express": "4.8.0"
+  }
+}
