@@ -23,9 +23,13 @@ function create() {
 
 	var floor = ground.create(0, game.world.height - 64, 'ground');
 	var wall = platforms.create(500, game.world.height - 84, 'ground');
+	var wall2 = platforms.create(20, game.world.height - 84, 'ground');
 
 	wall.scale.setTo(0.5, 0.5);
 	wall.body.immovable = true;
+
+	wall2.scale.setTo(0.5, 0.5);
+	wall2.body.immovable = true;
 
 	floor.scale.setTo(2, 2);
 	floor.body.immovable = true;
@@ -47,7 +51,6 @@ function update() {
 			game.player.collide(i.body.touching, {
 				invert: true
 			});
-			//console.log(i.body.blocked)
 		}
 	});
 
@@ -69,19 +72,16 @@ function update() {
 
 	if (doh.isDown) {
 		game.player.doh();
-	}
-	/*else if (jump.isDown) {
-		if (!jumping) {
-			console.log('jump')
-			jumping = true;
-			//game.player.animations.play('walkingJumpR');
-		}
-	} else */
+	} else if (jump.isDown) {
+		game.player.jumpForward();
+	} else
 
 	if (cursors.left.isDown) {
 		game.player.walk('L')
 	} else if (cursors.right.isDown) {
 		game.player.walk('R');
+	} else if(cursors.up.isDown){
+		game.player.jumpUp();
 	} else {
 		game.player.stop();
 		//game.player.idle();
@@ -103,27 +103,32 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 
 	me.walk = function(direction) {
 		direction = direction.toUpperCase();
+		if (me.state.turning || me.state.walkingCollide) return; //me.player.body.touching.right) return;
 
-		if (me.state.turning || me.state.startingWColide) return;
-
-		if(me.state.activeWColide){
-			me.currentAnmin = me.player.animations.play('WalkingCollideRActive');
-		} else if (direction != me.state.facing && !me.state.turning) {
+		if (direction != me.state.facing && !me.state.turning) {
+			me.player.scale.setTo(1, 1);
+			var turning = (me.state.facing == 'R' ? 'L' : 'R')
+			console.log('Facing', me.state.facing)
 			me.state.idle = false;
 			me.state.turning = true;
+			me.state.walking = false;
 			me.state.facing = direction;
+
 
 			//play turn anim
 			if (me.player.body)
 				me.player.body.velocity.x = 0;
-			me.currentAnmin = me.player.animations.play('walkTurn' + direction);
+			console.log('turning', turning)
+			me.currentAnmin = me.player.animations.play('walkTurn' + turning);
 		} else if (me.state.idle || !me.state.turning) {
+
 			me.state.idle = false;
 			me.state.walking = true;
 			me.state.facing = direction;
 			//play walk anmin
+
 			me.player.body.velocity.x = (me.state.facing == 'R' ? 120 : -120);
-			me.currentAnmin = me.player.animations.play('walking' + direction);
+			me.currentAnmin = me.player.animations.play('walking');
 		}
 	}
 	me.idle = function() {
@@ -131,27 +136,40 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			me.state.idle = true;
 			if (me.player.body)
 				me.player.body.velocity.x = 0;
-			me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
+			me.currentAnmin = me.player.animations.play('idle');
 		}
 	}
 	me.doh = function() {
 		if (!me.state.doh) {
+			me.state.idle = false;
 			me.state.doh = true;
 			me.currentAnmin = me.player.animations.play('doh');
 		}
 	}
 	me.stop = function() {
-		if (!me.state.stopping && !me.state.idle){
+		if (!me.state.stopping && !me.state.idle) {
+			me.state.idle = false;
 			me.state.stopping = true;
-		}else if(me.state.startingWColide || me.state.activeWColide){
-			me.state.stopingWColide = true;
-			me.state.activeWColide = false;
-			me.state.startingWColide = false
-			me.player.animations.play('WalkingCollideRStop');
+		}
+	}
+	me.jumpForward = function() {
+		if (!me.state.jumpingForward) {
+			me.state.idle = false;
+			me.state.jumpingForward = true;
+			me.currentAnmin = me.player.animations.play('standingJump');
+		}
+	}
+	me.jumpUp = function(){
+		me.player.body.velocity.y = -200;
+	}
+	me.normalizeState = function() {
+		for (var i in me.state) {
+			me.state.idle = false;
+			me.state[i] = false;
 		}
 	}
 	me.collide = function(location, opts) {
-		if(me.state.activeWColide || me.state.stopingWColide) return;
+		if (me.state.walkingCollide) return;
 
 		if (opts.invert) {
 			location = {
@@ -161,11 +179,12 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 				right: location.left
 			};
 		}
-		console.log('collide', me.state.startingWColide, me.state.activeWColide)
-		if(!me.state.startingWColide){
-			me.state.startingWColide = true;
-			me.currentAnmin = me.player.animations.play('WalkingCollideRStart');
-		}
+
+		if (location.up || location.down) return;
+
+		me.state.idle = false;
+		me.state.walkingCollide = true;
+		me.currentAnmin = me.player.animations.play('StandingCollide');
 
 	}
 	me.update = function() {
@@ -190,6 +209,11 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			me.state.stopping = false;
 			me.state.walking = false;
 			me.idle();
+		}else if(me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('j9') != -1){
+			me.player.body.velocity.y = -100;
+			me.player.body.velocity.x = (me.state.facing == 'R' ? 400 : -400);
+		}else if(me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('16') != -1){
+			me.player.body.velocity.x = 0;
 		}
 	}
 
@@ -199,19 +223,23 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 	me.player.events.onAnimationComplete.add(function() {
 		if (me.state.turning) {
 			me.state.turning = false;
-
-			if (!me.state.walking) me.currentAnmin = me.player.animations.play('idle' + me.state.facing);
+			me.player.scale.setTo((me.state.facing == 'R' ? 1 : -1), 1);
+			if (!me.state.walking) me.idle();
 		} else if (me.state.doh) {
 			me.state.doh = false;
 			me.idle();
-		} else if(me.state.startingWColide){
-			me.state.startingWColide = false;
-			me.state.activeWColide = true;
-		}else if(me.state.stopingWColide){
-			me.state.stopingWColide = false;
+		} else if (me.state.walkingCollide) {
+
+			me.state.walkingCollide = false;
 			me.idle();
 		}
-		console.log('complete', me.state.startingWColide, me.state.activeWColide)
+
+		if (me.state.jumpingForward) {
+			me.state.jumpingForward = false;
+			console.log(me.state)
+			me.idle();
+		}
+
 	}, me.player);
 
 	function init() {
@@ -234,9 +262,8 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			turning: false,
 			doh: false,
 			stopping: false,
-			activeWColide: false,
-			startingWColide: false,
-			stopingWColide: false
+			walkingCollide: false,
+			jumpingForward: false
 		}
 
 		me.idle();

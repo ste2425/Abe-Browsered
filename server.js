@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 
-app.set('port', 3001);
+app.set('port', process.env.PORT || 3001);
 app.set('root', __dirname);
 app.use(express.static(app.get('root') + '/public'));
 

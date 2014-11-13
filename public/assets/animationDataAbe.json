@@ -1,36 +1,16 @@
 {
-	"walkingR": {
-		"Data": ["wr1.png", "wr2.png", "wr3.png", "wr4.png", "wr5.png", "wr6.png", "wr7.png", "wr8.png", "wr9S.png", "wr10.png", "wr11.png", "wr12.png", "wr13.png", "wr14.png", "wr15.png", "wr16.png", "wr17.png", "wr18S.png"],
+	"walking": {
+		"Data": ["w1.png", "w2.png", "w3.png", "w4.png", "w5.png", "w6.png", "w7.png", "w8.png", "w9S.png", "w10.png", "w11.png", "w12.png", "w13.png", "w14.png", "w15.png", "w16.png", "w17.png", "w18S.png"],
 		"FrameRate": 20,
 		"Loop": true
 	},
-	"walkingL": {
-		"Data": ["wl1.png", "wl2.png", "wl3.png", "wl4.png", "wl5.png", "wl6.png", "wl7.png", "wl8.png", "wl9S.png", "wl10.png", "wl11.png", "wl12.png", "wl13.png", "wl14.png", "wl15.png", "wl16.png", "wl17.png", "wl18S.png"],
+	"StandingCollide": {
+		"Data" : ["wc1.png", "wc2.png", "wc3.png", "wc4.png", "wc5.png", "wc6.png", "wc7.png", "wc8.png", "wc9.png", "wc11.png", "wc12.png", "wc13.png", "wc14.png", "wc15.png", "wc16.png"],
 		"FrameRate": 20,
-		"Loop": true
-	},
-	"WalkingCollideRStart": {
-		"Data" : ["wcR1.png", "wcR2.png", "wcR3.png", "wcR4.png"],
-		"FrameRate": 40,
 		"Loop": false
 	},
-	"WalkingCollideRStop": {
-		"Data" : ["wcR14.png", "wcR15.png", "wcR16.png"],
-		"FrameRate": 40,
-		"Loop": false
-	},
-	"WalkingCollideRActive": {
-		"Data" : ["wcR5.png", "wcR6.png", "wcR7.png", "wcR8.png", "wcR9.png", "wcR11.png", "wcR12.png", "wcR13.png"],
-		"FrameRate": 13,
-		"Loop": true
-	},
-	"idleR": {
-		"Data": ["ir1.png", "ir2.png", "ir3.png", "ir4.png", "ir5.png", "ir6.png", "ir7.png", "ir8.png"],
-		"FrameRate": 11,
-		"Loop": true
-	},
-	"idleL": {
-		"Data": ["il1.png", "il2.png", "il3.png", "il4.png", "il5.png", "il6.png", "il7.png", "il8.png"],
+	"idle": {
+		"Data": ["i1.png", "i2.png", "i3.png", "i4.png", "i5.png", "i6.png", "i7.png", "i8.png"],
 		"FrameRate": 11,
 		"Loop": true
 	},
@@ -39,10 +19,10 @@
 		"FrameRate": 20,
 		"Loop": false
 	},
-	"walkingJumpR": {
-		"Data": ["jr1.png", "jr2.png", "jr3.png", "jr4.png", "jr5.png", "jr6.png", "jr7.png", "jr8.png", "jr9.png", "jr10.png", "jr11.png", "jr12.png", "jr13.png", "jr14.png", "jr15.png", "jr16.png", "jr17.png", "jr18.png", "jr19.png", "jr20.png", "jr21.png", "jr22.png", "jr1.png"],
+	"standingJump": {
+		"Data": ["j1.png", "j2.png", "j3.png", "j4.png", "j5.png", "j6.png", "j7.png", "j8.png", "j9.png", "j10.png", "j11.png", "j12.png", "j13.png", "j14.png", "j15.png", "j16.png", "j17.png", "j18.png", "j19.png", "j20.png", "j21.png", "j22.png", "j1.png"],
 		"FrameRate": 20,
-		"Loop": true
+		"Loop": false
 	},
 	"walkTurnL": {
 		"Data": ["wtL1.png", "wtL2.png", "wtL3.png", "wtL4.png", "wtL5.png", "wtL6.png", "wtL7.png", "wtL8.png", "wtL9.png", "wtL10.png"],
