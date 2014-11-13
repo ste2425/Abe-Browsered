@@ -80,7 +80,7 @@ function update() {
 		game.player.walk('L')
 	} else if (cursors.right.isDown) {
 		game.player.walk('R');
-	} else if(cursors.up.isDown){
+	} else if (cursors.up.isDown) {
 		game.player.jumpUp();
 	} else {
 		game.player.stop();
@@ -104,7 +104,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 	me.walk = function(direction) {
 		direction = direction.toUpperCase();
 		if (me.state.turning || me.state.walkingCollide) return; //me.player.body.touching.right) return;
-
+		me.state.stopping = false;
 		if (direction != me.state.facing && !me.state.turning) {
 			me.player.scale.setTo(1, 1);
 			var turning = (me.state.facing == 'R' ? 'L' : 'R')
@@ -123,12 +123,13 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 		} else if (me.state.idle || !me.state.turning) {
 
 			me.state.idle = false;
-			me.state.walking = true;
 			me.state.facing = direction;
 			//play walk anmin
-
 			me.player.body.velocity.x = (me.state.facing == 'R' ? 120 : -120);
-			me.currentAnmin = me.player.animations.play('walking');
+			if (!me.state.walking) {
+				me.state.walking = true;
+				me.currentAnmin = me.player.animations.play('walking');
+			}
 		}
 	}
 	me.idle = function() {
@@ -159,7 +160,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			me.currentAnmin = me.player.animations.play('standingJump');
 		}
 	}
-	me.jumpUp = function(){
+	me.jumpUp = function() {
 		me.player.body.velocity.y = -200;
 	}
 	me.normalizeState = function() {
@@ -183,6 +184,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 		if (location.up || location.down) return;
 
 		me.state.idle = false;
+		me.state.walking = false;
 		me.state.walkingCollide = true;
 		me.currentAnmin = me.player.animations.play('StandingCollide');
 
@@ -209,10 +211,10 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			me.state.stopping = false;
 			me.state.walking = false;
 			me.idle();
-		}else if(me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('j9') != -1){
+		} else if (me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('j9') != -1) {
 			me.player.body.velocity.y = -100;
 			me.player.body.velocity.x = (me.state.facing == 'R' ? 400 : -400);
-		}else if(me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('16') != -1){
+		} else if (me.state.jumpingForward && me.currentAnmin.currentFrame.name.indexOf('16') != -1) {
 			me.player.body.velocity.x = 0;
 		}
 	}
