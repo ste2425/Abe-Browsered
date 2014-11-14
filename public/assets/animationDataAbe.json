@@ -9,6 +9,11 @@
 		"FrameRate": 20,
 		"Loop": false
 	},
+	"JumpingCollide": {
+		"Data" : ["jc1.png", "jc2.png", "jc3.png", "jc4.png", "jc5.png", "jc6.png", "jc7.png", "jc8.png", "jc9.png", "jc10.png", "jc11.png", "jc12.png", "jc13.png", "jc14.png", "jc15.png", "jc16.png", "jc17.png", "jc18.png", "jc19.png", "jc20.png", "jc21.png", "jc22.png", "jc23.png", "jc24.png"],
+		"FrameRate": 20,
+		"Loop": false
+	},
 	"idle": {
 		"Data": ["i1.png", "i2.png", "i3.png", "i4.png", "i5.png", "i6.png", "i7.png", "i8.png"],
 		"FrameRate": 11,

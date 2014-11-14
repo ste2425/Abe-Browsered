@@ -23,13 +23,13 @@ function create() {
 
 	var floor = ground.create(0, game.world.height - 64, 'ground');
 	var wall = platforms.create(500, game.world.height - 84, 'ground');
-	var wall2 = platforms.create(20, game.world.height - 84, 'ground');
+	//var wall2 = platforms.create(20, game.world.height - 84, 'ground');
 
 	wall.scale.setTo(0.5, 0.5);
 	wall.body.immovable = true;
 
-	wall2.scale.setTo(0.5, 0.5);
-	wall2.body.immovable = true;
+	//wall2.scale.setTo(0.5, 0.5);
+	//wall2.body.immovable = true;
 
 	floor.scale.setTo(2, 2);
 	floor.body.immovable = true;
@@ -47,11 +47,9 @@ function update() {
 
 
 	game.physics.arcade.collide(game.player.player, platforms, function(e, i) {
-		if (game.player.state.walking) {
-			game.player.collide(i.body.touching, {
-				invert: true
-			});
-		}
+		game.player.collide(i.body.touching, {
+			invert: true
+		});
 	});
 
 	game.physics.arcade.collide(game.player.player, ground);
@@ -108,7 +106,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 		if (direction != me.state.facing && !me.state.turning) {
 			me.player.scale.setTo(1, 1);
 			var turning = (me.state.facing == 'R' ? 'L' : 'R')
-			console.log('Facing', me.state.facing)
+
 			me.state.idle = false;
 			me.state.turning = true;
 			me.state.walking = false;
@@ -118,7 +116,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			//play turn anim
 			if (me.player.body)
 				me.player.body.velocity.x = 0;
-			console.log('turning', turning)
+
 			me.currentAnmin = me.player.animations.play('walkTurn' + turning);
 		} else if (me.state.idle || !me.state.turning) {
 
@@ -170,7 +168,8 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 		}
 	}
 	me.collide = function(location, opts) {
-		if (me.state.walkingCollide) return;
+		console.log('collide')
+		if (me.state.walkingCollide || me.state.jumpingCollide) return;
 
 		if (opts.invert) {
 			location = {
@@ -183,10 +182,16 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 
 		if (location.up || location.down) return;
 
+		if(me.state.walking)
+			me.currentAnmin = me.player.animations.play('StandingCollide');
+		else if(me.state.jumpingForward){
+			me.currentAnmin = me.player.animations.play('JumpingCollide');
+		}
+
 		me.state.idle = false;
 		me.state.walking = false;
+		me.state.jumpingForward = false;
 		me.state.walkingCollide = true;
-		me.currentAnmin = me.player.animations.play('StandingCollide');
 
 	}
 	me.update = function() {
@@ -238,7 +243,6 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 
 		if (me.state.jumpingForward) {
 			me.state.jumpingForward = false;
-			console.log(me.state)
 			me.idle();
 		}
 
@@ -265,6 +269,7 @@ function character(Name, AnminData, Game, posX, posY, characterKey) {
 			doh: false,
 			stopping: false,
 			walkingCollide: false,
+			jumpingCollide: false,
 			jumpingForward: false
 		}
 
